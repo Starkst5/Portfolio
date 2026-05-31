@@ -1,0 +1,99 @@
+/* ─── Animated background ─────────────────────────────────────────── */
+
+.animated-bg {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+  }
+  
+  .animated-bg::before {
+    content: "";
+    position: absolute;
+    inset: -200%;
+    background-image:
+      linear-gradient(rgba(107, 114, 128, 0.12) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(107, 114, 128, 0.12) 1px, transparent 1px);
+    background-size: 60px 60px;
+    animation: gridMove 20s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  .animated-bg::after {
+    content: "";
+    position: absolute;
+    width: 600px;
+    height: 600px;
+    border-radius: 9999px;
+    background: radial-gradient(
+      circle,
+      rgba(107, 114, 128, 0.18) 0%,
+      transparent 70%
+    );
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    animation: glowPulse 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+  
+  .animated-bg > * {
+    position: relative;
+    z-index: 1;
+  }
+  
+  @keyframes gridMove {
+    from { transform: translate(0, 0); }
+    to   { transform: translate(60px, 60px); }
+  }
+  
+  @keyframes glowPulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); }
+    50%       { transform: translate(-50%, -50%) scale(1.2); }
+  }
+  
+  /* ─── Hero orbs ──────────────────────────────────────────────────── */
+  
+  .hero-orb {
+    position: absolute;
+    border-radius: 9999px;
+    filter: blur(100px);
+    pointer-events: none;
+  }
+  
+  .hero-orb-1 {
+    width: 550px; height: 550px;
+    background: rgba(107, 114, 128, 0.35);
+    top: -150px; left: -150px;
+    animation: heroFloatOne 10s ease-in-out infinite;
+  }
+  
+  .hero-orb-2 {
+    width: 450px; height: 450px;
+    background: rgba(75, 85, 99, 0.28);
+    top: 10%; right: -150px;
+    animation: heroFloatTwo 12s ease-in-out infinite;
+  }
+  
+  .hero-orb-3 {
+    width: 400px; height: 400px;
+    background: rgba(156, 163, 175, 0.4);
+    bottom: -100px; left: 35%;
+    animation: heroFloatThree 14s ease-in-out infinite;
+  }
+  
+  @keyframes heroFloatOne {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%       { transform: translate(160px, 100px) scale(1.12); }
+  }
+  
+  @keyframes heroFloatTwo {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%       { transform: translate(-140px, 90px) scale(1.15); }
+  }
+  
+  @keyframes heroFloatThree {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%       { transform: translate(-120px, -130px) scale(1.1); }
+  }
