@@ -112,7 +112,7 @@ export default function App() {
     {
       title: "Ninem",
       description: "Interactive web application that recreates retro Nintendo-inspired games while highlighting Nintendo's history, major milestones, and influence on the gaming industry. Built with a responsive design and browser-based gameplay to provide an engaging and accessible user experience.",
-      tech: ["Javascript", "HTML", "CSS"]
+      tech: ["Javascript", "CSS", "EmulatorJS"]
     },
     {
       title: "BMO",
