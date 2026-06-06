@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { Mail, Github, Linkedin, Code, Briefcase, GraduationCap, ArrowRight } from "lucide-react";
 import { useEffect, useRef } from "react";
 
-function NodeGraph() {
+function CircuitBoard() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -18,70 +18,62 @@ function NodeGraph() {
     resize();
     window.addEventListener("resize", resize);
 
-    const NODE_COUNT = 42;
-    const CONNECTION_DIST = 160;
-    const SPEED = 0.4;
+    const GRID = 40;
+    type Trace = { points: { x: number; y: number }[]; pulse: number; speed: number; alpha: number };
+    const traces: Trace[] = [];
 
-    type Node = {
-      x: number;
-      y: number;
-      vx: number;
-      vy: number;
-      radius: number;
+    const buildTrace = () => {
+      const cols = Math.floor(canvas.width / GRID);
+      const rows = Math.floor(canvas.height / GRID);
+      let x = Math.floor(Math.random() * cols) * GRID;
+      let y = Math.floor(Math.random() * rows) * GRID;
+      const points = [{ x, y }];
+      const steps = Math.floor(Math.random() * 8) + 5;
+      let dir = Math.floor(Math.random() * 4);
+
+      for (let i = 0; i < steps; i++) {
+        if (Math.random() > 0.7) dir = Math.floor(Math.random() * 4);
+        const dx = [GRID, -GRID, 0, 0][dir];
+        const dy = [0, 0, GRID, -GRID][dir];
+        x = Math.max(0, Math.min(canvas.width, x + dx));
+        y = Math.max(0, Math.min(canvas.height, y + dy));
+        points.push({ x, y });
+      }
+      return { points, pulse: 0, speed: Math.random() * 0.01 + 0.005, alpha: Math.random() * 0.25 + 0.1 };
     };
 
-    const nodes: Node[] = Array.from({ length: NODE_COUNT }, () => ({
-      x: Math.random() * canvas.width,
-      y: Math.random() * canvas.height,
-      vx: (Math.random() - 0.5) * SPEED,
-      vy: (Math.random() - 0.5) * SPEED,
-      radius: Math.random() * 2.5 + 1.5,
-    }));
+    for (let i = 0; i < 18; i++) traces.push(buildTrace());
 
     let animId: number;
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Move nodes
-      for (const n of nodes) {
-        n.x += n.vx;
-        n.y += n.vy;
-        if (n.x < 0 || n.x > canvas.width)  n.vx *= -1;
-        if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
-      }
+      for (const trace of traces) {
+        trace.pulse = (trace.pulse + trace.speed) % 1;
+        const glow = Math.sin(trace.pulse * Math.PI * 2) * 0.15 + trace.alpha;
 
-      // Draw edges
-      for (let i = 0; i < nodes.length; i++) {
-        for (let j = i + 1; j < nodes.length; j++) {
-          const dx = nodes[i].x - nodes[j].x;
-          const dy = nodes[i].y - nodes[j].y;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < CONNECTION_DIST) {
-            const alpha = (1 - dist / CONNECTION_DIST) * 0.35;
-            ctx.beginPath();
-            ctx.moveTo(nodes[i].x, nodes[i].y);
-            ctx.lineTo(nodes[j].x, nodes[j].y);
-            ctx.strokeStyle = `rgba(107, 114, 128, ${alpha})`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-          }
-        }
-      }
-
-      // Draw nodes
-      for (const n of nodes) {
         ctx.beginPath();
-        ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(107, 114, 128, 0.55)";
-        ctx.fill();
+        ctx.moveTo(trace.points[0].x, trace.points[0].y);
+        for (let i = 1; i < trace.points.length; i++) {
+          ctx.lineTo(trace.points[i].x, trace.points[i].y);
+        }
+        ctx.strokeStyle = `rgba(107, 114, 128, ${glow})`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        for (const pt of trace.points) {
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, 2.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(107, 114, 128, ${glow + 0.1})`;
+          ctx.fill();
+        }
       }
 
       animId = requestAnimationFrame(draw);
     };
 
     draw();
-
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
@@ -107,18 +99,20 @@ export default function App() {
     {
       title: "LineLogic",
       description: "Sports analytics platform that evaluates NBA player performance trends using historical statistics, matchup data, team rankings, injuries, and game schedules. Features player grading, confidence scoring, interactive dashboards, and data-driven insights to help users analyze player performance.",
-      tech: ["TypeScript", "PostgreSQL", "REST APIs"]
+      tech: ["TypeScript", "PostgreSQL", "REST APIs"],
       link: "https://main.d30q5uyhnagz2c.amplifyapp.com/"
     },
     {
       title: "Ninem",
       description: "Interactive web application that recreates retro Nintendo-inspired games while highlighting Nintendo's history, major milestones, and influence on the gaming industry. Built with a responsive design and browser-based gameplay to provide an engaging and accessible user experience.",
-      tech: ["Javascript", "CSS", "EmulatorJS"]
+      tech: ["Javascript", "HTML", "CSS"],
+      link: ""
     },
     {
       title: "BMO",
       description: "2D action game developed in Unity where players battle waves of enemies, earn upgrades, and progress through increasing levels of difficulty. Features player movement, enemy AI, combat mechanics, and a progression system designed to enhance gameplay and replayability.",
-      tech: ["C#", "Unity", "Blender"]
+      tech: ["C#", "Unity", "Blender"],
+      link: ""
     }
   ];
 
@@ -213,14 +207,12 @@ export default function App() {
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center px-6 pt-20 overflow-hidden bg-gray-50">
-        {/* Soft orbs behind the graph */}
         <div className="absolute inset-0 pointer-events-none">
           <div className="hero-orb hero-orb-1" />
           <div className="hero-orb hero-orb-2" />
           <div className="hero-orb hero-orb-3" />
         </div>
-        {/* Node graph canvas */}
-        <NodeGraph />
+        <CircuitBoard />
 
         <div className="relative z-10 max-w-4xl text-center">
           <motion.div
@@ -234,11 +226,9 @@ export default function App() {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="mb-8 flex justify-center"
             >
-             <img
-                src="/headshot_.jpg"
-                alt="Tyler Starks"
-                className="w-48 h-48 rounded-full object-cover border-4 border-gray-400 shadow-xl shadow-gray-400/50"
-              />
+              <div className="w-48 h-48 rounded-full bg-gradient-to-br from-gray-300 to-gray-500 flex items-center justify-center border-4 border-gray-400 shadow-xl shadow-gray-400/50">
+                <span className="text-6xl">👤</span>
+              </div>
             </motion.div>
             <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-gray-500 to-gray-700 bg-clip-text text-transparent">
               Tyler Starks
@@ -378,9 +368,13 @@ export default function App() {
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.2 }}
                   whileHover={{ y: -10 }}
-                  className="bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-gray-500 hover:shadow-xl hover:shadow-gray-200 transition-all"
+                  className={`bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-gray-500 hover:shadow-xl hover:shadow-gray-200 transition-all ${project.link ? "cursor-pointer" : ""}`}
+                  onClick={() => project.link && window.open(project.link, "_blank")}
                 >
-                  <h3 className="text-2xl font-bold mb-3 text-gray-900">{project.title}</h3>
+                  <h3 className="text-2xl font-bold mb-3 text-gray-900 flex items-center gap-2">
+                    {project.title}
+                    {project.link && <ArrowRight size={18} className="text-gray-500" />}
+                  </h3>
                   <p className="text-gray-600 mb-4">{project.description}</p>
                   <div className="flex flex-wrap gap-2">
                     {project.tech.map((tech) => (
