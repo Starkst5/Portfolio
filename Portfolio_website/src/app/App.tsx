@@ -84,7 +84,7 @@ function CircuitBoard() {
     <canvas
       ref={canvasRef}
       className="absolute inset-0 w-full h-full"
-      style={{ pointerEvents: "none" }}
+      style={{ pointerEvents: "none", zIndex: 0 }}
     />
   );
 }
@@ -207,14 +207,14 @@ export default function App() {
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center px-6 pt-20 overflow-hidden bg-gray-50">
-        <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 0 }}>
           <div className="hero-orb hero-orb-1" />
           <div className="hero-orb hero-orb-2" />
           <div className="hero-orb hero-orb-3" />
+          <CircuitBoard />
         </div>
-        <CircuitBoard />
 
-        <div className="relative z-10 max-w-4xl text-center">
+        <div className="relative max-w-4xl text-center" style={{ zIndex: 10 }}>
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -366,6 +366,7 @@ export default function App() {
                   href={project.link || undefined}
                   target={project.link ? "_blank" : undefined}
                   rel={project.link ? "noopener noreferrer" : undefined}
+                  style={{ textDecoration: "none", color: "inherit" }}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
