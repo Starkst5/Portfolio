@@ -361,15 +361,17 @@ export default function App() {
             <h2 className="text-4xl font-bold mb-12 text-center text-gray-900">Featured Projects</h2>
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
               {projects.map((project, index) => (
-                <motion.div
+                <motion.a
                   key={index}
+                  href={project.link || undefined}
+                  target={project.link ? "_blank" : undefined}
+                  rel={project.link ? "noopener noreferrer" : undefined}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.2 }}
                   whileHover={{ y: -10 }}
-                  className={`bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-gray-500 hover:shadow-xl hover:shadow-gray-200 transition-all ${project.link ? "cursor-pointer" : ""}`}
-                  onClick={() => project.link && window.open(project.link, "_blank")}
+                  className={`block bg-white p-6 rounded-lg border-2 border-gray-200 hover:border-gray-500 hover:shadow-xl hover:shadow-gray-200 transition-all ${project.link ? "cursor-pointer" : "cursor-default"}`}
                 >
                   <h3 className="text-2xl font-bold mb-3 text-gray-900 flex items-center gap-2">
                     {project.title}
@@ -386,7 +388,7 @@ export default function App() {
                       </span>
                     ))}
                   </div>
-                </motion.div>
+                </motion.a>
               ))}
             </div>
           </motion.div>
