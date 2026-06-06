@@ -108,6 +108,7 @@ export default function App() {
       title: "LineLogic",
       description: "Sports analytics platform that evaluates NBA player performance trends using historical statistics, matchup data, team rankings, injuries, and game schedules. Features player grading, confidence scoring, interactive dashboards, and data-driven insights to help users analyze player performance.",
       tech: ["TypeScript", "PostgreSQL", "REST APIs"]
+      link: "https://main.d30q5uyhnagz2c.amplifyapp.com/"
     },
     {
       title: "Ninem",
