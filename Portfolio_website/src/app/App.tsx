@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { Mail, Github, Linkedin, Code, Briefcase, GraduationCap, ArrowRight } from "lucide-react";
 import { useEffect, useRef } from "react";
 
-function CircuitBoard() {
+function NodeGraph() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
@@ -18,62 +18,67 @@ function CircuitBoard() {
     resize();
     window.addEventListener("resize", resize);
 
-    const GRID = 40;
-    type Trace = { points: { x: number; y: number }[]; pulse: number; speed: number; alpha: number };
-    const traces: Trace[] = [];
+    const NODE_COUNT = 42;
+    const CONNECTION_DIST = 160;
+    const SPEED = 0.4;
 
-    const buildTrace = () => {
-      const cols = Math.floor(canvas.width / GRID);
-      const rows = Math.floor(canvas.height / GRID);
-      let x = Math.floor(Math.random() * cols) * GRID;
-      let y = Math.floor(Math.random() * rows) * GRID;
-      const points = [{ x, y }];
-      const steps = Math.floor(Math.random() * 8) + 5;
-      let dir = Math.floor(Math.random() * 4);
-
-      for (let i = 0; i < steps; i++) {
-        if (Math.random() > 0.7) dir = Math.floor(Math.random() * 4);
-        const dx = [GRID, -GRID, 0, 0][dir];
-        const dy = [0, 0, GRID, -GRID][dir];
-        x = Math.max(0, Math.min(canvas.width, x + dx));
-        y = Math.max(0, Math.min(canvas.height, y + dy));
-        points.push({ x, y });
-      }
-      return { points, pulse: 0, speed: Math.random() * 0.01 + 0.005, alpha: Math.random() * 0.25 + 0.1 };
+    type Node = {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      radius: number;
     };
 
-    for (let i = 0; i < 18; i++) traces.push(buildTrace());
+    const nodes: Node[] = Array.from({ length: NODE_COUNT }, () => ({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * SPEED,
+      vy: (Math.random() - 0.5) * SPEED,
+      radius: Math.random() * 2.5 + 1.5,
+    }));
 
     let animId: number;
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      for (const trace of traces) {
-        trace.pulse = (trace.pulse + trace.speed) % 1;
-        const glow = Math.sin(trace.pulse * Math.PI * 2) * 0.15 + trace.alpha;
+      for (const n of nodes) {
+        n.x += n.vx;
+        n.y += n.vy;
+        if (n.x < 0 || n.x > canvas.width) n.vx *= -1;
+        if (n.y < 0 || n.y > canvas.height) n.vy *= -1;
+      }
 
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const dx = nodes[i].x - nodes[j].x;
+          const dy = nodes[i].y - nodes[j].y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < CONNECTION_DIST) {
+            const alpha = (1 - dist / CONNECTION_DIST) * 0.35;
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.strokeStyle = `rgba(107, 114, 128, ${alpha})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        }
+      }
+
+      for (const n of nodes) {
         ctx.beginPath();
-        ctx.moveTo(trace.points[0].x, trace.points[0].y);
-        for (let i = 1; i < trace.points.length; i++) {
-          ctx.lineTo(trace.points[i].x, trace.points[i].y);
-        }
-        ctx.strokeStyle = `rgba(107, 114, 128, ${glow})`;
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        for (const pt of trace.points) {
-          ctx.beginPath();
-          ctx.arc(pt.x, pt.y, 2.5, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(107, 114, 128, ${glow + 0.1})`;
-          ctx.fill();
-        }
+        ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(107, 114, 128, 0.55)";
+        ctx.fill();
       }
 
       animId = requestAnimationFrame(draw);
     };
 
     draw();
+
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener("resize", resize);
@@ -211,7 +216,7 @@ export default function App() {
           <div className="hero-orb hero-orb-1" />
           <div className="hero-orb hero-orb-2" />
           <div className="hero-orb hero-orb-3" />
-          <CircuitBoard />
+          <NodeGraph />
         </div>
 
         <div className="relative max-w-4xl text-center" style={{ zIndex: 10 }}>
@@ -226,9 +231,11 @@ export default function App() {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="mb-8 flex justify-center"
             >
-              <div className="w-48 h-48 rounded-full bg-gradient-to-br from-gray-300 to-gray-500 flex items-center justify-center border-4 border-gray-400 shadow-xl shadow-gray-400/50">
-                <span className="text-6xl">👤</span>
-              </div>
+              <img
+                src="/headshot_.jpg"
+                alt="Tyler Starks"
+                className="w-48 h-48 rounded-full object-cover border-4 border-gray-400 shadow-xl shadow-gray-400/50"
+              />
             </motion.div>
             <h1 className="text-6xl md:text-8xl font-bold mb-6 bg-gradient-to-r from-gray-500 to-gray-700 bg-clip-text text-transparent">
               Tyler Starks
